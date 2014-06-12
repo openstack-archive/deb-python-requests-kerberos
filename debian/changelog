@@ -1,0 +1,5 @@
+python-requests-kerberos (0.5-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #XXXXXX)
+
+ -- Thomas Goirand <zigo@debian.org>  Thu, 12 Jun 2014 09:09:45 +0800
