@@ -1,0 +1,2 @@
+version=3
+https://github.com/requests/requests-kerberos/tags .*/(\d[\d\.]+)\.tar\.gz
