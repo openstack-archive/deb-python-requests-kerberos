@@ -1,0 +1,18 @@
+Description: Fix setup.py to work as well in Python 3
+ The filter function in Python 3 doesn't return a list anymore, so we use
+ list() to convert it.
+Author: Thomas Goirand <zigo@debian.org>
+Forwarded: no
+Last-Update: 2014-06-17
+
+--- python-requests-kerberos-0.5.orig/setup.py
++++ python-requests-kerberos-0.5/setup.py
+@@ -29,7 +29,7 @@ def get_version():
+     """
+     reg = re.compile(r'__version__ = [\'"]([^\'"]*)[\'"]')
+     with open('requests_kerberos/__init__.py') as fd:
+-        matches = filter(lambda x: x, map(reg.match, fd))
++        matches = list(filter(lambda x: x, map(reg.match, fd)))
+ 
+     if not matches:
+         raise RuntimeError(

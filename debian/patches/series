@@ -1,1 +1,2 @@
 disable-broken-test-in-python3.patch
+fix-setup.py-to-work-with-python3.patch
