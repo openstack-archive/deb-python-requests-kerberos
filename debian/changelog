@@ -1,3 +1,11 @@
+python-requests-kerberos (0.5-3) unstable; urgency=medium
+
+  * Fixed swapped short package descriptions of python2.x and python3.x binary
+    packages. Thanks to Beatrice Torracca <beatricet@libero.it> for the bug
+    repport. (Closes: #782185)
+
+ -- Thomas Goirand <zigo@debian.org>  Thu, 09 Apr 2015 09:59:49 +0200
+
 python-requests-kerberos (0.5-2) unstable; urgency=high
 
   * CVE-2014-8650: failure to handle mutual authentication. Applied upstream
