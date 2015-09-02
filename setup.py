@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 import os
+import sys
 import re
 from setuptools import setup
 
 with open('requirements.txt') as requirements:
     requires = [line.strip() for line in requirements if line.strip()]
+
+if sys.platform == 'win32':
+    requires.append('kerberos-sspi')
+else:
+    requires.append('kerberos==1.1.1')
 
 path = os.path.dirname(__file__)
 desc_fd = os.path.join(path, 'README.rst')
@@ -43,6 +49,8 @@ setup(
     name='requests-kerberos',
     description=short_desc,
     long_description=long_desc,
+    author='Ian Cordasco, Cory Benfield, Michael Komitee',
+    author_email='graffatcolmingov@gmail.com',
     url='https://github.com/requests/requests-kerberos',
     packages=['requests_kerberos'],
     package_data={'': ['LICENSE', 'AUTHORS']},

@@ -1,4 +1,7 @@
-import kerberos
+try:
+    import kerberos
+except ImportError:
+    import kerberos_sspi as kerberos
 import re
 import logging
 
@@ -99,9 +102,8 @@ class HTTPKerberosAuth(AuthBase):
         try:
             result, self.context[host] = kerberos.authGSSClientInit(
                 "{0}@{1}".format(self.service, host))
-        except kerberos.GSSError as e:
-            log.error("generate_request_header(): authGSSClientInit() failed:")
-            log.exception(e)
+        except kerberos.GSSError:
+            log.exception("generate_request_header(): authGSSClientInit() failed:")
             return None
 
         if result < 1:
@@ -112,9 +114,8 @@ class HTTPKerberosAuth(AuthBase):
         try:
             result = kerberos.authGSSClientStep(self.context[host],
                                                 _negotiate_value(response))
-        except kerberos.GSSError as e:
-            log.error("generate_request_header(): authGSSClientStep() failed:")
-            log.exception(e)
+        except kerberos.GSSError:
+            log.exception("generate_request_header(): authGSSClientStep() failed:")
             return None
 
         if result < 0:
@@ -124,10 +125,9 @@ class HTTPKerberosAuth(AuthBase):
 
         try:
             gss_response = kerberos.authGSSClientResponse(self.context[host])
-        except kerberos.GSSError as e:
-            log.error("generate_request_header(): authGSSClientResponse() "
+        except kerberos.GSSError:
+            log.exception("generate_request_header(): authGSSClientResponse() "
                       "failed:")
-            log.exception(e)
             return None
 
         return "Negotiate {0}".format(gss_response)
@@ -194,8 +194,9 @@ class HTTPKerberosAuth(AuthBase):
                 return response
 
             elif is_http_error or self.mutual_authentication == OPTIONAL:
-                log.error("handle_other(): Mutual authentication unavailable "
-                          "on {0} response".format(response.status_code))
+                if not response.ok:
+                    log.error("handle_other(): Mutual authentication unavailable "
+                              "on {0} response".format(response.status_code))
 
                 if self.mutual_authentication == REQUIRED:
                     return SanitizedResponse(response)
@@ -227,13 +228,12 @@ class HTTPKerberosAuth(AuthBase):
         try:
             result = kerberos.authGSSClientStep(self.context[host],
                                                 _negotiate_value(response))
-        except kerberos.GSSError as e:
-            log.error("authenticate_server(): authGSSClientStep() failed:")
-            log.exception(e)
+        except kerberos.GSSError:
+            log.exception("authenticate_server(): authGSSClientStep() failed:")
             return False
 
         if result < 1:
-            log.error("auhenticate_server(): authGSSClientStep() failed: "
+            log.error("authenticate_server(): authGSSClientStep() failed: "
                       "{0}".format(result))
             return False
 
@@ -242,19 +242,29 @@ class HTTPKerberosAuth(AuthBase):
 
     def handle_response(self, response, **kwargs):
         """Takes the given response and tries kerberos-auth, as needed."""
+        num_401s = kwargs.pop('num_401s', 0)
 
         if self.pos is not None:
             # Rewind the file position indicator of the body to where
             # it was to resend the request.
             response.request.body.seek(self.pos)
 
-        if response.status_code == 401:
+        if response.status_code == 401 and num_401s < 2:
+            # 401 Unauthorized. Handle it, and if it still comes back as 401,
+            # that means authentication failed.
             _r = self.handle_401(response, **kwargs)
-            log.debug("handle_response(): returning {0}".format(_r))
-            return _r
+            log.debug("handle_response(): returning %s", _r)
+            log.debug("handle_response() has seen %d 401 responses", num_401s)
+            num_401s += 1
+            return self.handle_response(_r, num_401s=num_401s, **kwargs)
+        elif response.status_code == 401 and num_401s >= 2:
+            # Still receiving 401 responses after attempting to handle them.
+            # Authentication has failed. Return the 401 response.
+            log.debug("handle_response(): returning 401 %s", response)
+            return response
         else:
             _r = self.handle_other(response)
-            log.debug("handle_response(): returning {0}".format(_r))
+            log.debug("handle_response(): returning %s", _r)
             return _r
 
     def deregister(self, response):
@@ -266,5 +276,9 @@ class HTTPKerberosAuth(AuthBase):
         try:
             self.pos = request.body.tell()
         except AttributeError:
-            pass
+            # In the case of HTTPKerberosAuth being reused and the body
+            # of the previous request was a file-like object, pos has
+            # the file position of the previous body. Ensure it's set to
+            # None.
+            self.pos = None
         return request

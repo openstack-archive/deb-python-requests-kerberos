@@ -1,6 +1,39 @@
 History
 =======
 
+0.7.0: 2015-05-04
+-----------------
+
+- Added Windows native authentication support by adding kerberos-sspi as an
+  alternative backend.
+
+- Prevent infinite recursion when a server returns 401 to an authorization
+  attempt.
+
+- Reduce the logging during successful responses.
+
+0.6.1: 2014-11-14
+-----------------
+
+- Fix HTTPKerberosAuth not to treat non-file as a file
+
+- Prevent infinite recursion when GSSErrors occurs
+
+0.6: 2014-11-04
+---------------
+
+- Handle mutual authentication (see pull request 36_)
+
+  All users should upgrade immediately. This has been reported to
+  oss-security_ and we are awaiting a proper CVE identifier.
+
+  **Update**: We were issued CVE-2014-8650
+
+- Distribute as a wheel.
+
+.. _36: https://github.com/requests/requests-kerberos/pull/36
+.. _oss-security: http://www.openwall.com/lists/oss-security/
+
 0.5: 2014-05-14
 ---------------
 
