@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: PKG OpenStack <openstack-devel@lists.alioth.debian.org>
 Uploaders: Thomas Goirand <zigo@debian.org>
 Build-Depends: debhelper (>= 9),
-               python-all (>= 2.6.6-3~),
+               python-all,
                python-setuptools,
                python3-all,
                python3-setuptools
@@ -14,14 +14,13 @@ Build-Depends-Indep: python-kerberos (>= 1.1.1),
                      python3-kerberos (>= 1.1.1),
                      python3-mock,
                      python3-requests (>= 1.1.0)
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/python-requests-kerberos.git
 Vcs-Git: git://anonscm.debian.org/openstack/python-requests-kerberos.git
 Homepage: https://github.com/requests/requests-kerberos
 
 Package: python-requests-kerberos
 Architecture: all
-Pre-Depends: dpkg (>= 1.15.6~)
 Depends: python-kerberos (>= 1.1.1),
          python-requests (>= 1.1.0),
          ${misc:Depends},
@@ -35,7 +34,6 @@ Description: Kerberos/GSSAPI authentication handler for python-requests - Python
 
 Package: python3-requests-kerberos
 Architecture: all
-Pre-Depends: dpkg (>= 1.15.6~)
 Depends: python3-kerberos (>= 1.1.1),
          python3-requests (>= 1.1.0),
          ${misc:Depends},
