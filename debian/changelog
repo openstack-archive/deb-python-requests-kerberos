@@ -1,3 +1,9 @@
+python-requests-kerberos (0.7.0-3) UNRELEASED; urgency=medium
+
+  * Fixed VCS URLs (https).
+
+ -- Ondřej Nový <novy@ondrej.org>  Sun, 28 Feb 2016 15:49:10 +0100
+
 python-requests-kerberos (0.7.0-2) unstable; urgency=medium
 
   * Uploading to unstable.
