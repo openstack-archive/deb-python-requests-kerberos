@@ -1,4 +1,4 @@
-python-requests-kerberos (0.7.0-3) UNRELEASED; urgency=medium
+python-requests-kerberos (0.7.0-3) unstable; urgency=medium
 
   * Fixed VCS URLs (https).
   * d/rules: Changed UPSTREAM_GIT protocol to https
